@@ -32,7 +32,8 @@ class Login extends Component {
     else if (passwordLength > 0) return 'error';
   }
 
-  handleLogin() {
+  handleLogin(e) {
+    e.preventDefault();
     fetch("https://monpay.herokuapp.com/api/v1/auth/login", {
       method: 'POST',
       headers: {
@@ -61,7 +62,7 @@ class Login extends Component {
 
   render() {
     return (
-      <form className="Login-form" onSubmit={(e) => e.preventDefault()}>
+      <form className="Login-form" onSubmit={(e) => this.handleLogin(e)}>
         <FormGroup
           controlId="usernameField"
           validationState={this.validateEmail()}
@@ -90,7 +91,7 @@ class Login extends Component {
         <FormControl.Feedback />
         <HelpBlock>Should be atleast 8 characters long.</HelpBlock>
         </FormGroup>
-        <Button bsStyle="success" bsSize="large" block onClick={this.handleLogin}>Login</Button>
+        <Button type="submit" bsStyle="success" bsSize="large" block>Login</Button>
       </form>
     );
   }
