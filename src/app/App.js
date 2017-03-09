@@ -1,14 +1,25 @@
 import React, { Component } from 'react';
-import { Button } from 'react-bootstrap';
 import './App.css';
+import Navigation from '../navigation/Navigation';
 import Login from '../login/Login';
 import Home from '../home/Home';
+import Transactions from '../transactions/Transactions';
+import Beneficiaries from '../beneficiaries/Beneficiaries';
+import User from '../user/User';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      authenticated: false
+      authenticated: false,
+      component: null
+    };
+    this.components = {
+      login: <Login app={this} />,
+      home: <Home app={this} />,
+      transactions: <Transactions app={this} />,
+      beneficiaries: <Beneficiaries app={this} />,
+      user: <User app={this} />
     };
     this.handleLogout = this.handleLogout.bind(this);
   }
@@ -16,35 +27,30 @@ class App extends Component {
   componentWillMount() {
     const token = localStorage.getItem("token");
     if (token) {
-      this.setState({ authenticated: true });
+      this.setState({ authenticated: true, component: this.components.home });
+    } else {
+      this.setState({ component: this.components.login });
     }
   }
 
   handleLogout() {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
-    this.setState({ authenticated: false });
+    this.setState({ authenticated: false, component: this.components.login });
   }
 
   render() {
     return (
       <div className="App">
+        <Navigation app={this} />
         <div className="App-header">
           <h2>
             <span className="mon">Mon</span>
             <span className="pay">Pay</span>
           </h2>
           <h4>The easy way to transfer money</h4>
-          {this.state.authenticated &&
-            <Button
-              className="App-button-logout"
-              bsStyle="danger"
-              onClick={this.handleLogout}
-            >
-              Logout
-            </Button>}
         </div>
-        {this.state.authenticated ? <Home app={this} /> : <Login app={this} />}
+        {this.state.component}
       </div>
     );
   }
