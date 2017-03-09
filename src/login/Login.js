@@ -6,6 +6,7 @@ import {
   HelpBlock,
   Button
 } from 'react-bootstrap';
+import Networking from '../utils/Networking';
 import './Login.css';
 
 class Login extends Component {
@@ -23,7 +24,7 @@ class Login extends Component {
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     const test = re.test(this.state.email);
     if (test) return 'success';
-    else if (emailLength > 1) return 'error';
+    else if (emailLength > 0) return 'error';
   }
 
   validatePassword() {
@@ -34,29 +35,14 @@ class Login extends Component {
 
   handleLogin(e) {
     e.preventDefault();
-    fetch("https://monpay.herokuapp.com/api/v1/auth/login", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: this.state.email,
-        password: this.state.password
-      })
+    Networking.request("auth/login/", 'POST', {
+      email: this.state.email,
+      password: this.state.password
     })
     .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error();
-      }
-    })
-    .then(json => {
-      localStorage.setItem("token", json.token);
-      localStorage.setItem("refreshToken", json.refresh_token);
-      this.props.app.setState({ authenticated: true });
-    }).catch(error => {
-      console.log(error);
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("refreshToken", response.refresh_token);
+      this.props.app.setState({ authenticated: true, component: this.props.app.components.home });
     });
   }
 
